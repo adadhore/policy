@@ -18,17 +18,12 @@ allow[msg] {
     cpuUtilization < 80
     memoryUtilization < 90
 
-    failure_strategy := stage.spec.execution.failure_strategy
-    checkFailureStrategy(failure_strategy)
     not containserr
     msg := sprintf("Deployment stage '%s' is missing required steps: %v", [stage.name, missing_steps])
-}
-
-checkFailureStrategy(failure_strategy) {
-    failure_strategy == "Failure"  # Update this condition based on your specific requirements
 }
 
 containserr {
     required_steps[required_step]
     not contains(existing_steps, required_step)
+    required_step
 }
