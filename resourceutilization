@@ -1,0 +1,22 @@
+package pipeline
+
+allow[msg] {
+    stage := input.pipeline.stages[_].stage
+    stage.type == "Deployment"
+    existing_steps := {s | s = stage.spec.execution.steps[_].step.type}
+    missing_steps := required_steps - existing_steps
+    count(missing_steps) == 0
+
+    cpuUtilization := input.deployment.cpuUtilization
+    memoryUtilization := input.deployment.memoryUtilization
+    cpuUtilization < 80
+    memoryUtilization < 90
+
+    not containserr
+    msg := sprintf("Deployment stage '%s' is missing required steps: %v", [stage.name, missing_steps])
+}
+
+containserr {
+    required_steps[elem]
+    not contains(existing_steps, elem)
+}
