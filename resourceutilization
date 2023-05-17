@@ -1,5 +1,11 @@
 package pipeline
 
+required_steps := {
+    "DeployStep",
+    "SmokeTestStep",
+    "IntegrationTestStep"
+}
+
 allow[msg] {
     stage := input.pipeline.stages[_].stage
     stage.type == "Deployment"
@@ -17,6 +23,6 @@ allow[msg] {
 }
 
 containserr {
-    required_steps[elem]
-    not contains(existing_steps, elem)
+    required_steps[required_step]
+    not contains(existing_steps, required_step)
 }
